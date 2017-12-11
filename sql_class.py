@@ -53,10 +53,10 @@ class Sql(object):
 
             # Create the above table
             self.metadata.create_all(self.connection)
-            print('Table users is created')
+            print('Create users table')
             return users
         except InvalidRequestError:
-            print('Table users was already created')
+            print('Connect to existing users table')
             users = self.metadata.tables[config.get('postgres_table')]
             return users
 

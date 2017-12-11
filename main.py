@@ -34,8 +34,11 @@ if __name__ == '__main__':
     )
     conn, meta = sql.connect()
     # define instagram connection
+    print('Connect to Instagram')
     api = InstagramAPI(username=config.get('ig_username'), password=config.get('ig_password'))
     api.login()
     time.sleep(5)
     # crawl instagram followings
+    print('Crawl instagram followings...')
+    print()
     crawl_influencer_followings(sql=sql, api=api)

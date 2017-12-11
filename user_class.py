@@ -76,9 +76,7 @@ class User(object):
 
             if follow.get('is_private') is False:
                 new_user_id = str(follow.get('pk'))
-                if not User.is_user_in_db(sql=self.sql, user_id=new_user_id):
-                    # we keep the same sql and api connections
-                    new_user = User(user_id=new_user_id, sql=self.sql, api=self.api, from_user_id=self.user_id)
-                    new_user.save_user_in_db()
-                    print(new_user)
-                    print()
+                # we keep the same sql and api connections
+                new_user = User(user_id=new_user_id, sql=self.sql, api=self.api, from_user_id=self.user_id)
+                print(new_user)
+                print()
