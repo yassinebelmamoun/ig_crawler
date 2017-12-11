@@ -15,8 +15,7 @@ class User(object):
 
         # create row
         if not User.is_user_in_db(sql=self.sql, user_id=self.user_id):
-            # insert user in SQL db
-            self.insert_user_in_db()
+            # query user info api
             response = self.get_user_info()
             self.username = response.get('user').get('username')
             self.full_name = response.get('user').get('full_name')
@@ -27,8 +26,11 @@ class User(object):
             self.following_count = response.get('user').get('following_count')
             self.biography = response.get('user').get('biography')
             self.usertags_count = response.get('user').get('usertags_count')
+            # insert user in SQL db
+            self.insert_user_in_db()
         # or update row
         else:
+            # query local table
             user = self.sql.get_user_by_user_id(self.user_id)
             for key, value in user.items():
                 setattr(self, key, value)
@@ -46,7 +48,8 @@ class User(object):
             self.sleeper()
         response = self.api.LastJson
         # sleep just a little bit between each api call
-        time.sleep(2 + 2 * random.random())
+        duration = 2 + 2 * random.random()
+        time.sleep(duration)
         return response
 
     def sleeper(self):
