@@ -1,11 +1,5 @@
-decorator==4.1.2
-imageio==2.2.0
-moviepy==0.2.2.11
-numpy==1.13.3
-olefile==0.44
-Pillow==4.3.0
-psycopg2==2.7.3.2
 requests==2.11.1
 requests-toolbelt==0.7.0
-SQLAlchemy==1.1.15
-tqdm==4.19.4
+moviepy==0.2.2.11
+psycopg2==2.7.3.2
+sqlalchemy==1.1.15
