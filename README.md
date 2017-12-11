@@ -1,10 +1,9 @@
 # README
 
 
-##Setup
-- database requirements:
+## Setup
 
-you should have a postgresql user (yourself) and a database ('instagram' for example)
+- prerequired: a postgresql user (yourself) and a database ('instagram' for example)
 
 - create config.py file following the example file
 
@@ -14,6 +13,6 @@ you should have a postgresql user (yourself) and a database ('instagram' for exa
 
 pip3 install -r requirements.txt
 
-- run main script
+- run main script to crawl users
 
 python3 main.py
