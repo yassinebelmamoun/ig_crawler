@@ -6,7 +6,7 @@ from config import config
 from userclass import User
 from sqlclass import Sql
 
-influencer_id_list = ['4172793932', '21426140', '20392165', ]
+influencer_id_list = config.get('influencer_id_list')
 
 
 def check_api(current_api):
@@ -32,7 +32,6 @@ if __name__ == '__main__':
         password=config.get('postgres_password'),
         database=config.get('postgres_database')
     )
-    conn, meta = sql.connect()
     # define instagram connection
     print('Connect to Instagram')
     api = InstagramAPI(username=config.get('ig_username'), password=config.get('ig_password'))

@@ -86,4 +86,4 @@ class User(object):
                 print(new_user)
                 print()
             elif is_private is True:
-                print('User {} is private')
+                print('User {} is private'.format(new_user_id))
