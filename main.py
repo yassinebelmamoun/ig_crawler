@@ -3,8 +3,8 @@ import time
 from InstagramAPI import InstagramAPI
 
 from config import config
-from user_class import User
-from sql_class import Sql
+from userclass import User
+from sqlclass import Sql
 
 influencer_id_list = ['4172793932', '21426140', '20392165', ]
 
