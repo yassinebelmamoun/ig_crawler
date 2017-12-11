@@ -13,18 +13,27 @@ class User(object):
         self.from_user_id = from_user_id
         self.sleep_duration = 10
 
-        response = self.get_user_info()
-        self.username = response.get('user').get('username')
-        self.full_name = response.get('user').get('full_name')
-        self.is_private = response.get('user').get('is_private')
-        self.media_count = response.get('user').get('media_count')
-        self.profile_pic_url = response.get('user').get('profile_pic_url')
-        self.follower_count = response.get('user').get('follower_count')
-        self.following_count = response.get('user').get('following_count')
-        self.biography = response.get('user').get('biography')
-        self.usertags_count = response.get('user').get('usertags_count')
-
-        self.save_user_in_db()
+        # create row
+        if not User.is_user_in_db(sql=self.sql, user_id=self.user_id):
+            # insert user in SQL db
+            self.insert_user_in_db()
+            response = self.get_user_info()
+            self.username = response.get('user').get('username')
+            self.full_name = response.get('user').get('full_name')
+            self.is_private = response.get('user').get('is_private')
+            self.media_count = response.get('user').get('media_count')
+            self.profile_pic_url = response.get('user').get('profile_pic_url')
+            self.follower_count = response.get('user').get('follower_count')
+            self.following_count = response.get('user').get('following_count')
+            self.biography = response.get('user').get('biography')
+            self.usertags_count = response.get('user').get('usertags_count')
+        # or update row
+        else:
+            user = self.sql.get_user_by_user_id(self.user_id)
+            for key, value in user.items():
+                setattr(self, key, value)
+                # todo: append from_user_id to list
+            pass
 
     def __str__(self):
         return str({'user_id': self.user_id, 'from_user_id': self.from_user_id, 'username': self.username,
@@ -33,8 +42,11 @@ class User(object):
 
     def get_user_info(self):
         while not self.api.getUsernameInfo(self.user_id):
+            # sleep some time (increasing) if there is an error
             self.sleeper()
         response = self.api.LastJson
+        # sleep just a little bit between each api call
+        time.sleep(2 + 2 * random.random())
         return response
 
     def sleeper(self):
@@ -56,27 +68,19 @@ class User(object):
 
         self.sql.insert_user_in_table(user_dict=user_dict)
 
-    def save_user_in_db(self):
-        # create row
-        if not User.is_user_in_db(sql=self.sql, user_id=self.user_id):
-            # insert user in SQL db
-            self.insert_user_in_db()
-        # or update row
-        else:
-            # todo: append from_user_id to list
-            pass
-
     def get_and_save_user_followings(self):
         total_follows = self.api.getTotalFollowings(usernameId=self.user_id)
         total_follows = total_follows[:config.get('followings_limit')]
         size = len(total_follows)
         for i, follow in enumerate(total_follows):
-            time.sleep(2 + 2 * random.random())
             print('Following {}/{}'.format(i+1, size))
 
-            if follow.get('is_private') is False:
-                new_user_id = str(follow.get('pk'))
+            is_private = follow.get('is_private')
+            new_user_id = str(follow.get('pk'))
+            if is_private is False:
                 # we keep the same sql and api connections
                 new_user = User(user_id=new_user_id, sql=self.sql, api=self.api, from_user_id=self.user_id)
                 print(new_user)
                 print()
+            elif is_private is True:
+                print('User {} is private')

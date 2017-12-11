@@ -67,10 +67,16 @@ class Sql(object):
         print('Inserted user ', pk)
         return pk
 
-    def is_user_id_in_table(self, user_id):
+    def get_user_by_user_id(self, user_id):
         clause = self.table.select().where(self.table.c.user_id == user_id)
         result = self.connection.execute(clause)
-        for _ in result:
+        for user in result:
+            return dict(user)
+        return None
+
+    def is_user_id_in_table(self, user_id):
+        user = self.get_user_by_user_id(user_id=user_id)
+        if user:
             print('User {} already in db'.format(user_id))
             return True
         return False
@@ -82,7 +88,7 @@ if __name__ == '__main__':
         password=config.get('postgres_password'),
         database=config.get('postgres_database'),
     )
-    test_user = {'user_id': '4172793932', 'from_user_id': None, 'username': 'thisisjaney', 'full_name': '✨FB : Tidakan kawipongbunsiri', 'is_private': False, 'media_count': 152, 'profile_pic_url': 'https://scontent-cdg2-1.cdninstagram.com/t51.2885-19/s150x150/24274562_2084892915076925_8415373467389526016_n.jpg', 'follower_count': 36694, 'following_count': 237, 'biography': '✨Work Line : @tcg_group/direct', 'usertags_count': 38}
-    sql.insert_user_in_table(test_user)
-    sql.is_user_id_in_table('4172793932')
-    sql.is_user_id_in_table('4172793132')
+    user = sql.get_user_by_user_id(user_id='4172793932')
+    print(user)
+    print(sql.is_user_id_in_table(user_id='4172793932'))
+    print(sql.is_user_id_in_table(user_id='0123456789'))
