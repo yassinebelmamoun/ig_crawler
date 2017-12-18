@@ -74,6 +74,12 @@ class Sql(object):
             return dict(user)
         return None
 
+    def get_all_users(self):
+        clause = self.table.select()
+        result = self.connection.execute(clause)
+        for user in result:
+            yield dict(user)
+
     def is_user_id_in_table(self, user_id):
         user = self.get_user_by_user_id(user_id=user_id)
         if user:

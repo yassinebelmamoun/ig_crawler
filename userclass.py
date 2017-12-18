@@ -1,5 +1,6 @@
 import time
 import random
+import datetime
 
 from config import config
 
@@ -40,7 +41,7 @@ class User(object):
     def __str__(self):
         return str({'user_id': self.user_id, 'from_user_id': self.from_user_id, 'username': self.username,
                     'is_private': self.is_private, 'media_count': self.media_count, 'follower_count': self.follower_count,
-                    'following_count': self.following_count, 'usertags_count': self.usertags_count})
+                    'following_count': self.following_count, 'usertags_count': self.usertags_count}) + '\n' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     def get_user_info(self):
         while not self.api.getUsernameInfo(self.user_id):
@@ -87,3 +88,5 @@ class User(object):
                 print()
             elif is_private is True:
                 print('User {} is private'.format(new_user_id))
+                print()
+
