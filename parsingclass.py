@@ -1,3 +1,4 @@
+import csv
 import re
 
 import langdetect
@@ -7,48 +8,79 @@ from config import config
 from sqlclass import Sql
 
 
-def parse_instagram_bios(sql):
+def export_users_and_data(sql, max=-1):
+    # get users and data (via yield)
+    count = {}
+    users = parse_instagram_bios(sql, max)
+
+    #  writing all_users csv file
+    users_filename = 'instagram_users.csv'
+
+    users_fields = ['user_id', 'from_user_id', 'username', 'full_name', 'is_private', 'media_count', 'follower_count',
+                    'following_count', 'biography', 'usertags_count', 'language', 'email', 'phone', 'line', 'facebook',
+                    'whatsapp', 'wechat']
+
+    with open(users_filename, 'w') as user_file:
+        user_writer = csv.DictWriter(user_file, fieldnames=users_fields)
+        user_writer.writeheader()
+        for user, count in users:
+            user.pop('id')
+            user.pop('profile_pic_url')
+            user_writer.writerow(user)
+            count = count
+
+    print('File is generated')
+    print(count)
+
+
+def parse_instagram_bios(sql, max=-1):
+    # record some statistics while parsing
     count = {'total': 0, 'influencer': 0, 'th': 0, 'en': 0, 'email': 0, 'phone': 0,
              'whatsapp': 0, 'line': 0, 'wechat': 0, 'facebook': 0}
+
     users = sql.get_all_users()
-    max = 1000
+
     for i, user in enumerate(users):
         count['total'] += 1
-        print('------ User bio {}/{} ------'.format(i+1, max))
+
+        print('------ User parsed data {}/{} ------'.format(i+1, max))
+
         influencer = is_influencer(user)
         if influencer:
             count['influencer'] += 1
         biography = user.get('biography')
-        print(biography)
-        print()
 
         language = get_language(biography)
         for lang in ['th', 'en']:
             if language == lang:
                 count[lang] += 1
-        print('language: {}'.format(language))
 
         email = get_email(biography)
         if email != '':
             count['email'] += 1
-        print('email: {}'.format(email))
 
         phone = get_phone(biography)
         if phone != '':
             count['phone'] += 1
-        print('phone: {}'.format(phone))
 
+        apps = {}
         for app in ['whatsapp', 'line', 'wechat', 'facebook']:
             result = get_social_accounts(biography, app)
+            apps[app] = result
             if result != '':
                 count[app] += 1
-            print('{}: {}'.format(app, result))
 
+        user.update({'language': language, 'email': email, 'phone': phone,
+                     'whatsapp': apps['whatsapp'], 'line': apps['line'],
+                     'wechat': apps['wechat'], 'facebook': apps['facebook']})
+
+        print(user)
         print()
 
-        if i == max - 1:
-            print(count)
+        if i == max-1:
             break
+
+        yield user, count
 
 
 def get_language(biography):
@@ -93,8 +125,7 @@ def get_social_accounts(biography, app):
 
 def is_influencer(user):
     follower_count = user['follower_count']
-    result = follower_count > 9999
-    print('{} followers. Is influencer: {}'.format(follower_count, result))
+    result = follower_count >= 10000
     return result
 
 
@@ -108,4 +139,4 @@ if __name__ == '__main__':
     # crawl instagram followings
     print('Parse instagram bios...')
     print()
-    parse_instagram_bios(sql=sql)
+    export_users_and_data(sql, max=100)
